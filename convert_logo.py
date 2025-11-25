@@ -1,58 +1,50 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Convert ./img/yw_logo.png to Zebra GRF font file
+from PIL import Image
+import os
 
-import sys
-import re
-
-try:
-    from PIL import Image
-except ImportError:
-    print("❌ Error: Missing Pillow library, please run: pip3 install --user Pillow")
-    sys.exit(1)
-
-try:
-    import zpl
-except ImportError:
-    print("❌ Error: Missing zpl library, please run: pip3 install --user zpl")
-    sys.exit(1)
-
+# 输入 PNG
 INPUT = "img/yw_logo.png"
-OUTPUT = "img/logo.grf"
+# 输出 GRF
+OUTPUT = "img/yw_logo.grf"
 
-try:
-    img = Image.open(INPUT).convert("1")
-    
-    # Use zpl library to generate ZPL code containing graphics
-    label = zpl.Label(100, 100)
-    label.write_graphic(img, 50)  # Width 50mm
-    
-    zpl_code = label.dumpZPL()
-    
-    # Extract GFA (Graphic Field ASCII) data from ZPL code
-    # Format: ^GFA,bytes_total,bytes_per_row,bytes_compressed,data
-    match = re.search(r'\^GFA,(\d+),(\d+),(\d+),(.+)', zpl_code)
-    if match:
-        bytes_total = match.group(1)
-        bytes_per_row = match.group(2)
-        bytes_compressed = match.group(3)
-        data = match.group(4)
-        
-        # Generate GRF format: ~DGLOGO,bytes_total,bytes_per_row,bytes_compressed,data
-        grf_content = f"~DGLOGO,{bytes_total},{bytes_per_row},{bytes_compressed},{data}"
-        
-        with open(OUTPUT, "w") as f:
-            f.write(grf_content)
-        
-        print("✔ logo.grf generated →", OUTPUT)
-    else:
-        print("❌ Error: Unable to extract graphic data from ZPL code")
-        print("ZPL code preview:", zpl_code[:200])
-        sys.exit(1)
-        
-except Exception as e:
-    print(f"❌ Error: {e}")
-    import traceback
-    traceback.print_exc()
-    sys.exit(1)
+# Zebra 打印机默认 203dpi = 8 dots/mm
+DPI = 203
+
+
+def convert_png_to_grf(png_path, grf_path):
+    img = Image.open(png_path).convert("1")  # 转为黑白 1bit
+    width, height = img.size
+
+    # 每行字节数：每 8 像素 = 1 字节
+    bytes_per_row = (width + 7) // 8
+    total_bytes = bytes_per_row * height
+
+    print(f"Logo 尺寸：{width}x{height} px")
+    print(f"每行字节：{bytes_per_row}, 总字节：{total_bytes}")
+
+    # 生成 hex 流
+    hex_rows = []
+    pixels = img.load()
+
+    for y in range(height):
+        row_bytes = []
+        for x in range(0, width, 8):
+            byte = 0
+            for bit in range(8):
+                px = pixels[x + bit, y] if x + bit < width else 255
+                if px == 0:          # 黑色点 = 1
+                    byte |= (1 << (7 - bit))
+            row_bytes.append(f"{byte:02X}")
+        hex_rows.append("".join(row_bytes))
+
+    with open(grf_path, "w", newline="\n") as f:
+        f.write(f"~DGR:YWLOGO.GRF,{total_bytes},{bytes_per_row},\n")
+        f.write("".join(hex_rows))
+
+    print(f"✔ 成功生成 GRF：{grf_path}")
+
+
+if __name__ == "__main__":
+    convert_png_to_grf(INPUT, OUTPUT)

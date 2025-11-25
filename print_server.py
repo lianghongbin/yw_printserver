@@ -32,13 +32,23 @@ def load_template():
         base_path = os.path.dirname(os.path.abspath(__file__))
     
     template_path = os.path.join(base_path, TEMPLATE_FILE)
-    with open(template_path, "r", encoding="utf-8") as f:
+    # Read as binary because template contains binary GRF data
+    with open(template_path, "rb") as f:
         return f.read()
 
 def render(tpl, data):
+    # Template is bytes, convert to string for replacement, then back to bytes
+    # Use latin-1 encoding to preserve binary data (1:1 byte mapping)
+    if isinstance(tpl, bytes):
+        tpl_str = tpl.decode("latin-1")
+    else:
+        tpl_str = tpl
+    
     for k, v in data.items():
-        tpl = tpl.replace("{{" + k + "}}", str(v))
-    return tpl
+        tpl_str = tpl_str.replace("{{" + k + "}}", str(v))
+    
+    # Convert back to bytes
+    return tpl_str.encode("latin-1")
 
 class Handler(http.server.BaseHTTPRequestHandler):
     def log_message(self, fmt, *args):
@@ -114,8 +124,10 @@ class Handler(http.server.BaseHTTPRequestHandler):
             
             final_zpl = render(tpl, zpl_vars)
             print(f"[{timestamp}] [STEP 6] ZPL generated, size: {len(final_zpl)} bytes")
-            print(f"[{timestamp}] [STEP 6] ZPL preview (first 200 chars): {final_zpl[:200]}")
-            print(f"[{timestamp}] [STEP 6] ZPL preview (last 100 chars): ...{final_zpl[-100:]}")
+            # Preview as string for display (decode with latin-1 to preserve binary data)
+            preview_str = final_zpl.decode("latin-1", errors="replace")
+            print(f"[{timestamp}] [STEP 6] ZPL preview (first 200 chars): {preview_str[:200]}")
+            print(f"[{timestamp}] [STEP 6] ZPL preview (last 100 chars): ...{preview_str[-100:]}")
 
             # Step 7: Connect to printer
             print(f"[{timestamp}] [STEP 7] Connecting to printer {printer_id} at {printer_ip}:{PRINTER_PORT}")
@@ -133,7 +145,8 @@ class Handler(http.server.BaseHTTPRequestHandler):
                 raise Exception(f"Failed to connect to printer {printer_ip}:{PRINTER_PORT}: {e}")
 
             # Step 8: Send ZPL data
-            zpl_bytes = final_zpl.encode()
+            # final_zpl is already bytes
+            zpl_bytes = final_zpl if isinstance(final_zpl, bytes) else final_zpl.encode("latin-1")
             print(f"[{timestamp}] [STEP 8] Sending ZPL data ({len(zpl_bytes)} bytes)...")
             try:
                 s.sendall(zpl_bytes)
