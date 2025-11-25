@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>4x6 Label</title>
+<script src="./static/barcode.js"></script>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        width: 384px;
+        height: 576px;
+        font-family: Arial, Helvetica, sans-serif;
+        box-sizing: border-box;
+        position: relative;
+        border: none; /* 不显示外边框 */
+    }
+
+    .logo-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px;
+        padding-bottom: 5px;
+    }
+    .logo-row img { height: 100px; }
+    .title { font-size: 32px; font-weight: bold; }
+
+    .divider {
+        width: 100%;
+        border-top: 2px solid #000;
+        margin: 6px 0;
+    }
+
+    .row {
+        display: flex;
+        padding: 5px 15px;
+        font-size: 16px;
+    }
+    .row div:first-child { width: 180px; }
+    .row div:last-child  { width: 140px; }
+
+    .big-row {
+        display: flex;
+        padding: 0 15px;
+        font-size: 36px;
+        font-weight: bold;
+        margin-top: 5px;
+    }
+    .big-row div:first-child { width: 180px; }
+    .big-row div:last-child  { width: 140px; }
+
+    .barcode-section {
+        text-align: center;
+        margin-top: 15px;
+    }
+    #barcode { width: 300px; height: 80px; }
+    .barcode-text { font-size: 14px; margin-top: 3px; }
+
+    .row-small {
+        display: flex;
+        justify-content: space-between;
+        padding: 5px 15px;
+        font-size: 16px;
+        margin-top: 20px;
+    }
+
+    /* ★ 新增：固定 weight 左侧位置（160px 区域） */
+    .row-small div:last-child {
+        width: 160px;
+        text-align: left;
+    }
+
+    /* ★ 修改：让 of 的左边界与 weight 对齐 */
+    .cage-line {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 15px;
+        font-size: 16px;
+    }
+    .cage-left { }
+
+    .cage-right {
+        width: 160px;       /* 与 row-small 右栏一致 */
+        text-align: left;   /* ← 关键修复点 */
+        font-size: 32px;
+        font-weight: bold;
+    }
+
+    .bottom-warehouse {
+        padding: 10px 15px;
+        font-size: 20px;
+    }
+
+    .bottom-divider {
+        border-top: 2px solid #000;
+        width: 100%;
+        position: absolute;
+        bottom: 30px;
+        left: 0;
+    }
+
+    .footer-date {
+        position: absolute;
+        bottom: 5px;
+        right: 15px;
+        font-size: 16px;
+    }
+</style>
+</head>
+<body>
+
+<div class="logo-row">
+    <img src="./img/yw_logo.png">
+    <div class="title">Transit</div>
+</div>
+
+<div class="divider"></div>
+
+<div class="row">
+    <div>From :</div>
+    <div>To :</div>
+</div>
+
+<div class="big-row">
+    <div id="from">LAX01</div>
+    <div id="to">DFW01</div>
+</div>
+
+<div class="divider"></div>
+
+<div class="barcode-section">
+    <svg id="barcode"></svg>
+    <div class="barcode-text" id="barcode_text">25112415LAX01ZX002007001</div>
+</div>
+
+<div class="row-small">
+    <div>pieces : <span id="pieces">12</span></div>
+    <div>weight : <span id="weight">0kg</span></div>
+</div>
+
+<!-- CageNo + of -->
+<div class="cage-line">
+    <div class="cage-left">CageNo :</div>
+    <div class="cage-right">of</div>
+</div>
+
+<div class="divider"></div>
+
+<div class="bottom-warehouse" id="footer_warehouse">DFW01</div>
+
+<div class="bottom-divider"></div>
+
+<div class="footer-date" id="footer_time">2025.11.24 16:16:04</div>
+
+<script>
+    let barcodeValue = "25112415LAX01ZX002007001";
+    JsBarcode("#barcode", barcodeValue, {
+        format: "CODE128",
+        width: 2,
+        height: 80,
+        displayValue: false,
+        margin: 0
+    });
+</script>
+
+</body>
+</html>
