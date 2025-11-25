@@ -2,73 +2,68 @@
 ^PW812
 ^LL1218
 
-{{LOGO_GRF}}
+^FO30,90
+^A0N,40,40
+^FDYANWEN^FS
 
-^FO30,30
-^XGLOGO,1,1^FS
-
-^FO600,40
+^FO600,80
 ^A0N,60,60
 ^FDTransit^FS
 
-^FO0,130
+^FO0,220
 ^GB812,3,3^FS
 
-^FO30,160
+^FO30,250
 ^A0N,30,30
 ^FDFrom :^FS
 
-^FO350,160
+^FO420,250
 ^A0N,30,30
 ^FDTo :^FS
 
-^FO30,205
+^FO30,335
 ^A0N,70,70
 ^FD{{from}}^FS
 
-^FO350,205
+^FO420,335
 ^A0N,70,70
 ^FD{{to}}^FS
 
-^FO0,300
+^FO0,500
 ^GB812,3,3^FS
 
-^FO80,340
-^BY3,3,120
-^BCN,120,Y,N,N
+^FO100,540
+^BY2,3,100
+^BCN,100,Y,N,N
 ^FD{{barcode}}^FS
 
-^FO200,480
-^A0N,30,30
-^FD{{barcode}}^FS
-
-^FO30,540
+^FO30,790
 ^A0N,30,30
 ^FDpieces : {{pieces}}^FS
 
-^FO550,540
+^FO550,790
 ^A0N,30,30
 ^FDweight : {{weight}}^FS
 
-^FO30,600
+^FO30,850
 ^A0N,30,30
 ^FDCageNo :^FS
 
-^FO550,600
+^FO550,850
 ^A0N,60,60
 ^FD{{of}}^FS
 
-^FO0,660
+^FO0,910
 ^GB812,3,3^FS
 
-^FO30,700
+^FO30,950
 ^A0N,40,40
 ^FD{{footer_warehouse}}^FS
 
-^FO0,900
+^FO0,1150
 ^GB812,3,3^FS
 
-^FO600,935
+^FO470,1180
 ^A0N,30,30
 ^FD{{footer_time}}^FS
 

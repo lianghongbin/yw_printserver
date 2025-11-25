@@ -19,27 +19,18 @@ fi
 
 echo "✔ logo.grf generated"
 
-# Step 2: Inject logo.grf into template
-echo "→ 2. Injecting GRF into template..."
+# Step 2: Copy template to final (no logo injection needed)
+echo "→ 2. Preparing template..."
 
-# Use Python to safely replace placeholders (avoid sed special character issues)
+# Simply copy template.zpl to template_final.zpl (no logo replacement needed)
 .venv/bin/python3 << 'PYTHON_SCRIPT'
-import re
-
 # Read template
 with open("template.zpl", "r", encoding="utf-8") as f:
     template = f.read()
 
-# Read GRF content
-with open("img/logo.grf", "r", encoding="utf-8") as f:
-    logo_grf = f.read()
-
-# Replace placeholder
-final_template = template.replace("{{LOGO_GRF}}", logo_grf)
-
-# Write final file
+# Write final file (no logo replacement)
 with open("template_final.zpl", "w", encoding="utf-8") as f:
-    f.write(final_template)
+    f.write(template)
 PYTHON_SCRIPT
 
 echo "✔ template_final.zpl generated"
