@@ -27,24 +27,39 @@ pip install -q --upgrade pip
 pip install -q -r requirements.txt
 pip install -q pyinstaller
 
-# Generate logo.grf if needed
-if [ ! -f "img/logo.grf" ]; then
-    echo "Generating logo.grf..."
-    python convert_logo.py
+# Check if GRF file exists
+if [ ! -f "img/yw_logo_final.grf" ]; then
+    echo "Error: img/yw_logo_final.grf not found"
+    echo "Please ensure the GRF file exists before building"
+    exit 1
 fi
 
-# Generate template_final.zpl if needed
+# Generate template_final.zpl if needed (using binary GRF injection)
 if [ ! -f "template_final.zpl" ]; then
     echo "Generating template_final.zpl..."
     python3 << 'PYTHON_SCRIPT'
-import re
+# Read template
 with open("template.zpl", "r", encoding="utf-8") as f:
     template = f.read()
-with open("img/logo.grf", "r", encoding="utf-8") as f:
-    logo_grf = f.read()
-final_template = template.replace("{{LOGO_GRF}}", logo_grf)
-with open("template_final.zpl", "w", encoding="utf-8") as f:
-    f.write(final_template)
+
+# Read GRF content (binary)
+with open("img/yw_logo_final.grf", "rb") as f:
+    grf_data = f.read()
+
+# Split template to insert GRF binary data properly
+parts = template.split("{{LOGO_GRF}}")
+if len(parts) == 2:
+    # Write template part 1, then GRF binary, then template part 2
+    with open("template_final.zpl", "wb") as f:
+        f.write(parts[0].encode("utf-8"))
+        f.write(grf_data)  # Write GRF as binary
+        f.write(parts[1].encode("utf-8"))
+else:
+    # Fallback: simple replacement (may not work for binary data)
+    grf_str = grf_data.decode("latin-1", errors="ignore")
+    final_template = template.replace("{{LOGO_GRF}}", grf_str)
+    with open("template_final.zpl", "wb") as f:
+        f.write(final_template.encode("latin-1", errors="ignore"))
 PYTHON_SCRIPT
 fi
 

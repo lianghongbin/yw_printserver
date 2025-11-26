@@ -8,7 +8,6 @@ a = Analysis(
     binaries=[],
     datas=[
         ('template_final.zpl', '.'),
-        ('img/logo.grf', 'img'),
     ],
     hiddenimports=[],
     hookspath=[],
